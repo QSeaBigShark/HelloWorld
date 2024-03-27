@@ -119,16 +119,29 @@ $PE_t=[sin(w_0t),sin(w_1t),...,sin(w_{i-1}t),...,sin(w_{d_{model}-1}t))]$,
 $w_i=\frac{1}{10000^{\frac{1}{d_{model}-1}}}$
 
 5. *用sin和cos交替表示*  
+4中用sin函数作为位置编码，且选择较小的频率，使得不会出现有不同的位置t下出现相同的位置编码。基于此，位置向量实现了(1)每个token的向量唯一；(2)位置向量有界，且在连续空间。现在还希望**不同位置向量可以通过线性转换得到**，即：  
+$PE_{t+\Delta t}=T_{\Delta t}*PE_t$  
+其中T表示线性变换矩阵，  
+$$\begin{pmatrix}sin(t+\Delta t) \\ cos(t+\Delta t) \end{pmatrix} = \begin{pmatrix} cos\Delta t & sin\Delta t \\ -sin\Delta t & cos\Delta t\end{pmatrix} \begin{pmatrix} sint \\ cost \end{pmatrix}$$
+基于以上，可以将原来sin函数的$PE_t$做一个替换，让位置两两一组，分别用sin和cos的函数对来表示，可以$PE_t$表示成：
+$PE_t=[sin(w_0t), cos(w_0t), sin(w_1t), cos(w_1t), ..., sin(w_{\frac{d_{model}}{2}-1}t), cos(w_{\frac{d_{model}}{2}-1}t)]$
 
 
-*Transformer中的位置编码方法:*  
-$t表示词在句子中的位置$   
-$\vec{p_{t}}\in R^d 表示t位置对应的向量$  
-$d是向量的维度$  
-$f: N\rightarrow R^d 是生成位置向量\vec{p_{t}}的函数$
+可以用线性变化把$PE_t$转变成$PE_{t+\Delta t}$.
 
-## 四、self-attention注意力机制
+## 四、Transformer中位置编码方法：Sinusoidal functions
+Transformer位置编码的重要性质
 
+(1)性质一：两个位置编码的点积，仅取决于偏移量$\Delta t$,也即两个位置编码的点积可以反应出两个位置编码间的距离。  
+(2)性质二：位置编码的点积是无向的，即$PE^T_{t}*PE_{t+\Delta t} = PE^T_{t} * PE_{t-\Delta t}$
+
+
+## 五、self-attention注意力机制
+![alt text](RNN结构.png)
+
+RNN存在的问题：
+**(1)Sequential operations的复杂度随着序列长度增加而增加**
+**(2)Maximum Path length的复杂度随着序列长度的增加而增加**
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({ tex2jax: {inlineMath: [['$', '$']]}, messageStyle: "none" });
