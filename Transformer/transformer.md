@@ -139,9 +139,44 @@ Transformer位置编码的重要性质
 ## 五、self-attention注意力机制
 ![alt text](RNN结构.png)
 
-RNN存在的问题：
+1. **RNN存在的问题:**
 **(1)Sequential operations的复杂度随着序列长度增加而增加**
 **(2)Maximum Path length的复杂度随着序列长度的增加而增加**
+
+$\colorbox{yellow}{attention的基本运作方式就是：对于每个token，让它不损失信息地看见序列里的其他token,且可以同时生成每个token其对应的输出。}$ 
+
+2. **Attention的计算流程**
+a. 对于每个token会产生三个向量query,key,value;  
+b. 每个token的query都和其他token的key做某种计算，得到的结果是attention score;  
+c. 将每个score分别乘上每个token的value,得到抽取信息完毕的向量
+
+定义几个数据
+输入数据X，形状为(Seq_length, embedding_length):
+$$\begin{pmatrix} a_{11} & ... & a_{1j}\\ a_{21}&...&a_{2j} \\... & &... \\ a_{i1} &...&a_{ij}\end{pmatrix}, i\in[1,Seq\_length],j\in[1,embedding\_length]$$
+self-attention中的三个$W^K,W^Q,W^V$参数矩阵,
+$W^K$的形状是(embedding_length, k_dim)
+$W^Q$的形状是(embedding_length, k_dim)
+$W^V$的形状是(embedding_length, v_dim)
+$$
+\begin{cases}
+    Q=XW^Q, Q的形状是(Seq\_length, k\_dim) \\
+    K=XW^K,K的形状是(Seq\_length, k\_dim) \\
+    V=XW^V,V的形状是(Seq\_length, v\_dim)
+\end{cases}$$
+
+attention矩阵$QK^T$,最终结果矩阵Attention(Q,K,V),
+$Attention(Q,K,V)=softmax(\frac{QK^T}{\sqrt{d_k}})V$
+上面$d_k$就是k_dim, $softmax(\frac{QK^T}{\sqrt``{d_k}})$就是attention score矩阵。  
+
+面对的问题：
+1.为什么要在softmax的过程中，进行scaling？
+2.为什么做scaled dot-product，是乘上了因子$\frac{1}{\sqrt{d_k}}$，而不是其他的值，如2，3，4等呢？
+
+
+
+
+
+![alt text](self-attention机制.jpg)
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({ tex2jax: {inlineMath: [['$', '$']]}, messageStyle: "none" });
